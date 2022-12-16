@@ -1,4 +1,5 @@
 from aws_cdk import (
+    Aws,
     CfnMapping,
     Stack
 )
@@ -58,7 +59,7 @@ class DiscourseStack(Stack):
             vpc=vpc
         )
 
-        with open("consul/launch_config_user_data.sh") as f:
+        with open("discourse/launch_config_user_data.sh") as f:
             launch_config_user_data = f.read()
         asg = Asg(
             self,
@@ -66,7 +67,13 @@ class DiscourseStack(Stack):
             secret_arns=[db_secret.secret_arn()],
             default_instance_type = "t3.xlarge",
             user_data_contents = launch_config_user_data,
-            user_data_variables = {},
+            user_data_variables = {
+                "AssetsBucketName": bucket.bucket_name(),
+                "DbSecretArn": db_secret.secret_arn(),
+                "Hostname": dns.hostname(),
+                "HostedZoneName": dns.route_53_hosted_zone_name_param.value_as_string,
+                "InstanceSecretName": Aws.STACK_NAME + "/instance/credentials"
+            },
             vpc = vpc
         )
         asg.asg.node.add_dependency(db.db_primary_instance)
