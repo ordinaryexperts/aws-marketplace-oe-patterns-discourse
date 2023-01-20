@@ -1,6 +1,7 @@
 from aws_cdk import (
     Aws,
     CfnMapping,
+    CfnParameter,
     Stack
 )
 from constructs import Construct
@@ -15,12 +16,20 @@ from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
 
-AMI_ID="ami-045a75cc535f2e466"
-AMI_NAME="ordinary-experts-patterns-consul--20221215-0925"
+# AMI_ID="ami-01be9e4e694f60ba2"
+# AMI_NAME="ordinary-experts-patterns-discourse--20221218-0306"
+# generated_ami_ids = {
+#     "us-east-1": "ami-01be9e4e694f60ba2"
+# }
+# End generated code block.
+AMI_ID="ami-01be9e4e694f60ba2"
+AMI_NAME="ordinary-experts-patterns-discourse--20221218-0306"
 generated_ami_ids = {
-    "us-east-1": "ami-045a75cc535f2e466"
+    "us-east-1": "ami-01be9e4e694f60ba2"
 }
 # End generated code block.
+
+
 
 class DiscourseStack(Stack):
 
@@ -31,6 +40,13 @@ class DiscourseStack(Stack):
         vpc = Vpc(
             self,
             "Vpc"
+        )
+
+        self.name_param = CfnParameter(
+            self,
+            "Name",
+            default="Discourse",
+            description="The name of this Discourse site."
         )
 
         dns = Dns(self, "Dns")
