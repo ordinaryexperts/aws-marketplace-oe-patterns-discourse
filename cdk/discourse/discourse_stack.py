@@ -16,20 +16,12 @@ from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
 
-# AMI_ID="ami-01be9e4e694f60ba2"
-# AMI_NAME="ordinary-experts-patterns-discourse--20221218-0306"
-# generated_ami_ids = {
-#     "us-east-1": "ami-01be9e4e694f60ba2"
-# }
-# End generated code block.
-AMI_ID="ami-01be9e4e694f60ba2"
-AMI_NAME="ordinary-experts-patterns-discourse--20221218-0306"
+AMI_ID="ami-05dfcee8fb56abc98"
+AMI_NAME="ordinary-experts-patterns-discourse--20230120-0659"
 generated_ami_ids = {
-    "us-east-1": "ami-01be9e4e694f60ba2"
+    "us-east-1": "ami-05dfcee8fb56abc98"
 }
 # End generated code block.
-
-
 
 class DiscourseStack(Stack):
 
@@ -75,14 +67,14 @@ class DiscourseStack(Stack):
             vpc=vpc
         )
 
-        with open("discourse/launch_config_user_data.sh") as f:
-            launch_config_user_data = f.read()
+        with open("discourse/user_data.sh") as f:
+            user_data = f.read()
         asg = Asg(
             self,
             "Asg",
             secret_arns=[db_secret.secret_arn()],
             default_instance_type = "t3.xlarge",
-            user_data_contents = launch_config_user_data,
+            user_data_contents = user_data,
             user_data_variables = {
                 "AssetsBucketName": bucket.bucket_name(),
                 "DbSecretArn": db_secret.secret_arn(),
