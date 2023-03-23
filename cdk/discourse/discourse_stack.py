@@ -106,7 +106,7 @@ class DiscourseStack(Stack):
             mapping=ami_mapping
         )
 
-        alb = Alb(self, "Alb", asg=asg, vpc=vpc, target_group_https = False)
+        alb = Alb(self, "Alb", asg=asg, vpc=vpc)
         asg.asg.target_group_arns = [ alb.target_group.ref ]
 
         dns.add_alb(alb)
