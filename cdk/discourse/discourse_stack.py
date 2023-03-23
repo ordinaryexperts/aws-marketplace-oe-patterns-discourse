@@ -50,7 +50,7 @@ class DiscourseStack(Stack):
             "AssetsBucket"
         )
 
-        Ses(
+        ses = Ses(
             self,
             "Ses",
             hosted_zone_name=dns.route_53_hosted_zone_name_param.value_as_string,
@@ -77,16 +77,16 @@ class DiscourseStack(Stack):
         asg = Asg(
             self,
             "Asg",
-            secret_arns=[db_secret.secret_arn(), instanceSecretArn],
+            secret_arns=[db_secret.secret_arn(), ses.secret_arn()],
             default_instance_type = "t3.xlarge",
+            use_graviton = False,
             user_data_contents = user_data,
             user_data_variables = {
                 "AssetsBucketName": bucket.bucket_name(),
                 "DbSecretArn": db_secret.secret_arn(),
                 "Hostname": dns.hostname(),
                 "HostedZoneName": dns.route_53_hosted_zone_name_param.value_as_string,
-                "InstanceSecretArn": instanceSecretArn,
-                "Region": Stack.of(self).region
+                "InstanceSecretArn": ses.secret_arn()
             },
             vpc = vpc
         )

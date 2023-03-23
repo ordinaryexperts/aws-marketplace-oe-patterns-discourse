@@ -23,7 +23,7 @@ aws secretsmanager get-secret-value \
     --query SecretString \
 | jq -r > /opt/oe/patterns/instance-secret.json
 
-export DISCOURSE_SMTP_ADDRESS="email-smtp.${Region}.amazonaws.com"
+export DISCOURSE_SMTP_ADDRESS="email-smtp.${AWS::Region}.amazonaws.com"
 export DISCOURSE_SMTP_USER_NAME=$(cat /opt/oe/patterns/instance-secret.json | jq -r .access_key_id)
 export DISCOURSE_SMTP_PASSWORD=$(cat /opt/oe/patterns/instance-secret.json | jq -r .smtp_password)
 
