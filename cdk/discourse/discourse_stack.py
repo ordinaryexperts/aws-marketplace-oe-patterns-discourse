@@ -2,8 +2,10 @@ from aws_cdk import (
     Aws,
     CfnMapping,
     CfnParameter,
+    aws_secretsmanager,
     Stack
 )
+
 from constructs import Construct
 
 from oe_patterns_cdk_common.alb import Alb
@@ -16,10 +18,10 @@ from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
 
-AMI_ID="ami-05dfcee8fb56abc98"
-AMI_NAME="ordinary-experts-patterns-discourse--20230120-0659"
+AMI_ID="ami-073d4397976bc560c"
+AMI_NAME="ordinary-experts-patterns-discourse--20230323-0624"
 generated_ami_ids = {
-    "us-east-1": "ami-05dfcee8fb56abc98"
+    "us-east-1": "ami-073d4397976bc560c"
 }
 # End generated code block.
 
@@ -67,12 +69,15 @@ class DiscourseStack(Stack):
             vpc=vpc
         )
 
+        #instanceSecret = aws_secretsmanager.Secret.fromSecretName(self, 'InstanceSecret', Aws.STACK_NAME + "/instance/credentials");
+        instanceSecretArn = "arn:aws:secretsmanager:us-east-1:992593896645:secret:oe-patterns-discourse-richardgavel/instance/credentials-nvx4tZ"
+
         with open("discourse/user_data.sh") as f:
             user_data = f.read()
         asg = Asg(
             self,
             "Asg",
-            secret_arns=[db_secret.secret_arn()],
+            secret_arns=[db_secret.secret_arn(), instanceSecretArn],
             default_instance_type = "t3.xlarge",
             user_data_contents = user_data,
             user_data_variables = {
@@ -80,7 +85,8 @@ class DiscourseStack(Stack):
                 "DbSecretArn": db_secret.secret_arn(),
                 "Hostname": dns.hostname(),
                 "HostedZoneName": dns.route_53_hosted_zone_name_param.value_as_string,
-                "InstanceSecretName": Aws.STACK_NAME + "/instance/credentials"
+                "InstanceSecretArn": instanceSecretArn,
+                "Region": Stack.of(self).region
             },
             vpc = vpc
         )
