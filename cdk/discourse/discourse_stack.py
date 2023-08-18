@@ -14,6 +14,7 @@ from oe_patterns_cdk_common.assets_bucket import AssetsBucket
 from oe_patterns_cdk_common.aurora_cluster import AuroraPostgresql
 from oe_patterns_cdk_common.db_secret import DbSecret
 from oe_patterns_cdk_common.dns import Dns
+from oe_patterns_cdk_common.elasticache_cluster import ElasticacheRedis
 from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
@@ -48,6 +49,13 @@ class DiscourseStack(Stack):
         bucket = AssetsBucket(
             self,
             "AssetsBucket"
+        )
+
+        # redis
+        redis = ElasticacheRedis(
+            self,
+            "Redis",
+            vpc=vpc
         )
 
         ses = Ses(
@@ -94,6 +102,7 @@ class DiscourseStack(Stack):
         )
         asg.asg.node.add_dependency(db.db_primary_instance)
         Util.add_sg_ingress(db, asg.sg)
+        redis_ingress = Util.add_sg_ingress(redis, asg.sg)
 
         ami_mapping={
             "AMI": {
