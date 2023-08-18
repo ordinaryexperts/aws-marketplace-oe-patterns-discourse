@@ -43,15 +43,15 @@ templates:
   - "templates/web.ratelimited.template.yml"
 ##   - "templates/postgres.template.yml"
 ## Uncomment these two lines if you wish to add Lets Encrypt (https)
-  - "templates/web.ssl.template.yml"
-  - "templates/web.letsencrypt.ssl.template.yml"
+##   - "templates/web.ssl.template.yml"
+##   - "templates/web.letsencrypt.ssl.template.yml"
 
 ## which TCP/IP ports should this container expose?
 ## If you want Discourse to share a port with another webserver like Apache or nginx,
 ## see https://meta.discourse.org/t/17247 for details
 expose:
   - "80:80"   # http
-  - "443:443" # https
+##  - "443:443" # https
 
 params:
   db_default_text_search_config: "pg_catalog.english"
@@ -144,6 +144,8 @@ run:
 EOF
 chmod o-rwx /var/discourse/containers/app.yml
 
-echo 'test'
+cd /var/discourse
+./launcher rebuild app
+
 success=$?
 cfn-signal --exit-code $success --stack ${AWS::StackName} --resource Asg --region ${AWS::Region}
