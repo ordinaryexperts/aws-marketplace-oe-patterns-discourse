@@ -59,12 +59,14 @@ class DiscourseStack(Stack):
 
         db_secret = DbSecret(
             self,
-            "DbSecret"
+            "DbSecret",
+            username = "discourse"
         )
 
         db = AuroraPostgresql(
             self,
             "Db",
+            database_name="discourse",
             db_secret=db_secret,
             vpc=vpc
         )
