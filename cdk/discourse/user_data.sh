@@ -27,31 +27,21 @@ export DISCOURSE_SMTP_ADDRESS="email-smtp.${AWS::Region}.amazonaws.com"
 export DISCOURSE_SMTP_USER_NAME=$(cat /opt/oe/patterns/instance-secret.json | jq -r .access_key_id)
 export DISCOURSE_SMTP_PASSWORD=$(cat /opt/oe/patterns/instance-secret.json | jq -r .smtp_password)
 
-cat <<EOF > /var/discourse/containers/app.yml
-## this is the all-in-one, standalone Discourse Docker container template
-##
-## After making changes to this file, you MUST rebuild
-## /var/discourse/launcher rebuild app
-##
-## BE *VERY* CAREFUL WHEN EDITING!
-## YAML FILES ARE SUPER SUPER SENSITIVE TO MISTAKES IN WHITESPACE OR ALIGNMENT!
-## visit http://www.yamllint.com/ to validate this file as needed
+mkdir -p /var/discourse/shared/standalone/ssl
 
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+  -keyout /var/discourse/shared/standalone/ssl/ssl.key \
+  -out /var/discourse/shared/standalone/ssl/ssl.crt \
+  -subj '/CN=localhost'
+
+cat <<EOF > /var/discourse/containers/app.yml
 templates:
-  - "templates/redis.template.yml"
   - "templates/web.template.yml"
   - "templates/web.ratelimited.template.yml"
-##   - "templates/postgres.template.yml"
-## Uncomment these two lines if you wish to add Lets Encrypt (https)
-##   - "templates/web.ssl.template.yml"
-##   - "templates/web.letsencrypt.ssl.template.yml"
+  - "templates/web.ssl.template.yml"
 
-## which TCP/IP ports should this container expose?
-## If you want Discourse to share a port with another webserver like Apache or nginx,
-## see https://meta.discourse.org/t/17247 for details
 expose:
-  - "80:80"   # http
-##  - "443:443" # https
+  - "443:443" # https
 
 params:
   db_default_text_search_config: "pg_catalog.english"
@@ -82,8 +72,6 @@ env:
   ## will be set automatically by bootstrap based on detected CPUs, or you can override
   UNICORN_WORKERS: 4
 
-  ## TODO: The domain name this Discourse instance will respond to
-  ## Required. Discourse will not work with a bare IP number.
   DISCOURSE_HOSTNAME: ${Hostname}
 
   ## Uncomment if you want the container to be started with the same
@@ -94,9 +82,6 @@ env:
   ## on initial signup example 'user1@example.com,user2@example.com'
   DISCOURSE_DEVELOPER_EMAILS: 'dylan@ordinaryexperts.com'
 
-  ## TODO: The SMTP mail server used to validate new accounts and send notifications
-  # SMTP ADDRESS, username, and password are required
-  # WARNING the char '#' in SMTP password can cause problems!
   DISCOURSE_SMTP_ADDRESS: $DISCOURSE_SMTP_ADDRESS
   DISCOURSE_SMTP_PORT: 587
   DISCOURSE_SMTP_USER_NAME: $DISCOURSE_SMTP_USER_NAME
@@ -104,6 +89,8 @@ env:
   #DISCOURSE_SMTP_ENABLE_START_TLS: true           # (optional, default true)
   DISCOURSE_SMTP_DOMAIN: ${Hostname}
   DISCOURSE_NOTIFICATION_EMAIL: noreply@${Hostname}
+
+  DISCOURSE_REDIS_HOST: ${RedisCluster.RedisEndpoint.Address}
 
   ## If you added the Lets Encrypt template, uncomment below to get a free SSL certificate
   LETSENCRYPT_ACCOUNT_EMAIL: dylan@ordinaryexperts.com

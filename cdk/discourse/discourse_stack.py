@@ -121,7 +121,6 @@ class DiscourseStack(Stack):
             self,
             "Alb",
             asg=asg,
-            target_group_https=False,
             vpc=vpc
         )
         asg.asg.target_group_arns = [ alb.target_group.ref ]
