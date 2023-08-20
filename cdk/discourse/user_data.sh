@@ -26,6 +26,8 @@ aws secretsmanager get-secret-value \
 export DISCOURSE_SMTP_ADDRESS="email-smtp.${AWS::Region}.amazonaws.com"
 export DISCOURSE_SMTP_USER_NAME=$(cat /opt/oe/patterns/instance-secret.json | jq -r .access_key_id)
 export DISCOURSE_SMTP_PASSWORD=$(cat /opt/oe/patterns/instance-secret.json | jq -r .smtp_password)
+export ACCESS_KEY_ID=$(cat /opt/oe/patterns/instance-secret.json | jq -r .access_key_id)
+export SECRET_ACCESS_KEY=$(cat /opt/oe/patterns/instance-secret.json | jq -r .secret_access_key)
 
 mkdir -p /var/discourse/shared/standalone/ssl
 
@@ -67,6 +69,15 @@ env:
   DISCOURSE_DB_PASSWORD: $DB_PASSWORD
   DISCOURSE_DB_HOST: ${DbCluster.Endpoint.Address}
   DISCOURSE_DB_NAME: discourse
+
+  DISCOURSE_USE_S3: true
+  DISCOURSE_S3_REGION: ${AWS::Region}
+  DISCOURSE_S3_ACCESS_KEY_ID: $ACCESS_KEY_ID
+  DISCOURSE_S3_SECRET_ACCESS_KEY: $SECRET_ACCESS_KEY
+  DISCOURSE_S3_CDN_URL: https://${AssetsBucketName}.s3.${AWS::Region}.amazonaws.com
+  DISCOURSE_S3_BUCKET: ${AssetsBucketName}
+  DISCOURSE_S3_BACKUP_BUCKET: ${AssetsBucketName}/backups
+  DISCOURSE_BACKUP_LOCATION: s3
 
   ## How many concurrent web requests are supported? Depends on memory and CPU cores.
   ## will be set automatically by bootstrap based on detected CPUs, or you can override
@@ -115,6 +126,12 @@ volumes:
 ## Plugins go here
 ## see https://meta.discourse.org/t/19157 for details
 hooks:
+  after_assets_precompile:
+    - exec:
+        cd: \$home
+        cmd:
+          - sudo -E -u discourse bundle exec rake s3:upload_assets
+          - sudo -E -u discourse bundle exec rake s3:expire_missing_assets
   after_code:
     - exec:
         cd: \$home/plugins

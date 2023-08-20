@@ -48,7 +48,9 @@ class DiscourseStack(Stack):
 
         bucket = AssetsBucket(
             self,
-            "AssetsBucket"
+            "AssetsBucket",
+            object_ownership_value = "ObjectWriter",
+            remove_public_access_block = True
         )
 
         # redis
