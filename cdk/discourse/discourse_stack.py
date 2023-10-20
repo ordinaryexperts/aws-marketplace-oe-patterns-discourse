@@ -90,6 +90,7 @@ class DiscourseStack(Stack):
             self,
             "Asg",
             secret_arns=[db_secret.secret_arn(), ses.secret_arn()],
+            create_and_update_timeout_minutes = 30,
             default_instance_type = "t3.xlarge",
             use_graviton = False,
             user_data_contents = user_data,
@@ -123,6 +124,7 @@ class DiscourseStack(Stack):
             self,
             "Alb",
             asg=asg,
+            health_check_path="/srv/status",
             vpc=vpc
         )
         asg.asg.target_group_arns = [ alb.target_group.ref ]
