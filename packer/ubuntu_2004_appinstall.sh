@@ -126,9 +126,13 @@ apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 docker run hello-world
 
 # https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md#5-install-discourse
+# TODO sed command to fix elb health check
 git clone https://github.com/discourse/discourse_docker.git /var/discourse
 cd /var/discourse
+git checkout fcce1376043adeb09e21ec1ec079a41e4d29fe6e # base image to discourse/base:2.0.20231218-0429
 chmod 700 containers
+# pull initial image
+docker pull discourse/base:2.0.20230711-0100
 
 # post install steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_POSTINSTALL"

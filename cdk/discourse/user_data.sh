@@ -149,7 +149,8 @@ EOF
 chmod o-rwx /var/discourse/containers/app.yml
 
 cd /var/discourse
-./launcher rebuild app
+./launcher bootstrap app
+./launcher start app
 
 success=$?
 cfn-signal --exit-code $success --stack ${AWS::StackName} --resource Asg --region ${AWS::Region}
