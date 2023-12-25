@@ -1,8 +1,6 @@
 from aws_cdk import (
-    Aws,
     CfnMapping,
     CfnParameter,
-    aws_secretsmanager,
     Stack
 )
 
@@ -14,15 +12,16 @@ from oe_patterns_cdk_common.assets_bucket import AssetsBucket
 from oe_patterns_cdk_common.aurora_cluster import AuroraPostgresql
 from oe_patterns_cdk_common.db_secret import DbSecret
 from oe_patterns_cdk_common.dns import Dns
+from oe_patterns_cdk_common.efs import Efs
 from oe_patterns_cdk_common.elasticache_cluster import ElasticacheRedis
 from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
 
-AMI_ID="ami-073d4397976bc560c"
-AMI_NAME="ordinary-experts-patterns-discourse--20230323-0624"
+AMI_ID="ami-01c4f3d5ecf8fbb3c"
+AMI_NAME="ordinary-experts-patterns-discourse-07e8d10-20231221-0621"
 generated_ami_ids = {
-    "us-east-1": "ami-073d4397976bc560c"
+    "us-east-1": "ami-01c4f3d5ecf8fbb3c"
 }
 # End generated code block.
 
@@ -42,6 +41,13 @@ class DiscourseStack(Stack):
             "Name",
             default="Discourse",
             description="The name of this Discourse site."
+        )
+
+        self.admin_emails_param = CfnParameter(
+            self,
+            "AdminEmails",
+            default="",
+            description="Comma-separated list of admin emails for this Discourse site."
         )
 
         dns = Dns(self, "Dns")
@@ -81,9 +87,6 @@ class DiscourseStack(Stack):
             vpc=vpc
         )
 
-        #instanceSecret = aws_secretsmanager.Secret.fromSecretName(self, 'InstanceSecret', Aws.STACK_NAME + "/instance/credentials");
-        instanceSecretArn = "arn:aws:secretsmanager:us-east-1:992593896645:secret:oe-patterns-discourse-richardgavel/instance/credentials-nvx4tZ"
-
         with open("discourse/user_data.sh") as f:
             user_data = f.read()
         asg = Asg(
@@ -105,7 +108,7 @@ class DiscourseStack(Stack):
         )
         asg.asg.node.add_dependency(db.db_primary_instance)
         Util.add_sg_ingress(db, asg.sg)
-        redis_ingress = Util.add_sg_ingress(redis, asg.sg)
+        Util.add_sg_ingress(redis, asg.sg)
 
         ami_mapping={
             "AMI": {
@@ -119,6 +122,9 @@ class DiscourseStack(Stack):
             "AWSAMIRegionMap",
             mapping=ami_mapping
         )
+
+        # efs
+        Efs(self, "Efs", app_sg=asg.sg, vpc=vpc)
 
         alb = Alb(
             self,

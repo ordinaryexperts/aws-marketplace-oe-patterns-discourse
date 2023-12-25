@@ -1,6 +1,31 @@
 #!/bin/bash
 
+# aws cloudwatch
+sed -i 's/ASG_APP_LOG_GROUP_PLACEHOLDER/${AsgAppLogGroup}/g' /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+sed -i 's/ASG_SYSTEM_LOG_GROUP_PLACEHOLDER/${AsgSystemLogGroup}/g' /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+systemctl enable amazon-cloudwatch-agent
+systemctl start amazon-cloudwatch-agent
+
+# reprovision if access key is rotated
+# access key serial: ${SesInstanceUserAccessKeySerial}
+
 mkdir -p /opt/oe/patterns
+
+# efs
+mkdir /mnt/efs
+echo "${AppEfs}:/ /mnt/efs efs _netdev 0 0" >> /etc/fstab
+mount -a
+mkdir -p /mnt/efs/discourse/shared
+if [ -d /var/discourse/shared ] && [ ! -L /var/discourse/shared ]; then
+    rm -rf /var/discourse/shared
+    ln -s /mnt/efs/discourse/shared /var/discourse
+    mkdir -p /var/discourse/shared/standalone/ssl
+
+    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+            -keyout /var/discourse/shared/standalone/ssl/ssl.key \
+            -out /var/discourse/shared/standalone/ssl/ssl.crt \
+            -subj '/CN=localhost'
+fi
 
 # DB secret
 DB_SECRET_ARN="${DbSecretArn}"
@@ -28,13 +53,6 @@ export DISCOURSE_SMTP_USER_NAME=$(cat /opt/oe/patterns/instance-secret.json | jq
 export DISCOURSE_SMTP_PASSWORD=$(cat /opt/oe/patterns/instance-secret.json | jq -r .smtp_password)
 export ACCESS_KEY_ID=$(cat /opt/oe/patterns/instance-secret.json | jq -r .access_key_id)
 export SECRET_ACCESS_KEY=$(cat /opt/oe/patterns/instance-secret.json | jq -r .secret_access_key)
-
-mkdir -p /var/discourse/shared/standalone/ssl
-
-openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-  -keyout /var/discourse/shared/standalone/ssl/ssl.key \
-  -out /var/discourse/shared/standalone/ssl/ssl.crt \
-  -subj '/CN=localhost'
 
 cat <<EOF > /var/discourse/containers/app.yml
 templates:
@@ -81,7 +99,7 @@ env:
 
   ## How many concurrent web requests are supported? Depends on memory and CPU cores.
   ## will be set automatically by bootstrap based on detected CPUs, or you can override
-  UNICORN_WORKERS: 4
+  #UNICORN_WORKERS: 4
 
   DISCOURSE_HOSTNAME: ${Hostname}
 
@@ -89,9 +107,9 @@ env:
   ## hostname (-h option) as specified above (default "$hostname-$config")
   #DOCKER_USE_HOSTNAME: true
 
-  ## TODO: List of comma delimited emails that will be made admin and developer
+  ## List of comma delimited emails that will be made admin and developer
   ## on initial signup example 'user1@example.com,user2@example.com'
-  DISCOURSE_DEVELOPER_EMAILS: 'dylan@ordinaryexperts.com'
+  DISCOURSE_DEVELOPER_EMAILS: '${AdminEmails}'
 
   DISCOURSE_SMTP_ADDRESS: $DISCOURSE_SMTP_ADDRESS
   DISCOURSE_SMTP_PORT: 587
@@ -99,12 +117,9 @@ env:
   DISCOURSE_SMTP_PASSWORD: "$DISCOURSE_SMTP_PASSWORD"
   #DISCOURSE_SMTP_ENABLE_START_TLS: true           # (optional, default true)
   DISCOURSE_SMTP_DOMAIN: ${Hostname}
-  DISCOURSE_NOTIFICATION_EMAIL: noreply@${Hostname}
+  DISCOURSE_NOTIFICATION_EMAIL: no-reply@${Hostname}
 
   DISCOURSE_REDIS_HOST: ${RedisCluster.RedisEndpoint.Address}
-
-  ## If you added the Lets Encrypt template, uncomment below to get a free SSL certificate
-  LETSENCRYPT_ACCOUNT_EMAIL: dylan@ordinaryexperts.com
 
   ## The http or https CDN address for this Discourse instance (configured to pull)
   ## see https://meta.discourse.org/t/14857 for details
@@ -144,6 +159,7 @@ run:
   ## If you want to set the 'From' email address for your first registration, uncomment and change:
   ## After getting the first signup email, re-comment the line. It only needs to run once.
   #- exec: rails r "SiteSetting.notification_email='info@unconfigured.discourse.org'"
+  - exec: rails r "SiteSetting.force_https=true"
   - exec: echo "End of custom commands"
 EOF
 chmod o-rwx /var/discourse/containers/app.yml

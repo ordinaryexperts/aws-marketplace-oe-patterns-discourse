@@ -6,6 +6,7 @@ update-common:
 deploy: build
 	docker-compose run -w /code/cdk --rm devenv cdk deploy \
 	--require-approval never \
+	--parameters AdminEmails=dylan@ordinaryexperts.com \
 	--parameters AlbCertificateArn=arn:aws:acm:us-east-1:992593896645:certificate/943928d7-bfce-469c-b1bf-11561024580e \
 	--parameters AlbIngressCidr=0.0.0.0/0 \
 	--parameters AsgReprovisionString=20221008.1 \

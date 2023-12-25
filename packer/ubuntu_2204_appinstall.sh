@@ -5,7 +5,7 @@ SCRIPT_POSTINSTALL=ubuntu_2004_2204_postinstall.sh
 # preinstall steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_PREINSTALL"
 chmod +x $SCRIPT_PREINSTALL
-./$SCRIPT_PREINSTALL
+./$SCRIPT_PREINSTALL --install-efs-utils
 rm $SCRIPT_PREINSTALL
 
 # aws cloudwatch
@@ -95,6 +95,78 @@ cat <<EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
             "log_group_name": "ASG_SYSTEM_LOG_GROUP_PLACEHOLDER",
             "log_stream_name": "{instance_id}-/var/log/amazon/ssm/errors.log",
             "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/nginx/access.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/nginx/access.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/nginx/error.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/nginx/error.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/kern.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/kern.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/user.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/user.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/messages",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/messages",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/syslog",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/syslog",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/auth.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/auth.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/rails/sidekiq.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/rails/sidekiq.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/rails/production_errors.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/rails/production_errors.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/rails/unicorn.stderr.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/rails/unicorn.stderr.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/rails/unicorn.stdout.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/rails/unicorn.stdout.log",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/discourse/shared/standalone/log/var-log/rails/production.log",
+            "log_group_name": "ASG_APP_LOG_GROUP_PLACEHOLDER",
+            "log_stream_name": "{instance_id}-/var/discourse/shared/standalone/log/var-log/rails/production.log",
+            "timezone": "UTC"
           }
         ]
       }
@@ -123,14 +195,24 @@ apt-get update
 
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-docker run hello-world
-
 # https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md#5-install-discourse
-# TODO sed command to fix elb health check
 git clone https://github.com/discourse/discourse_docker.git /var/discourse
 cd /var/discourse
 git checkout fcce1376043adeb09e21ec1ec079a41e4d29fe6e # base image to discourse/base:2.0.20231218-0429
 chmod 700 containers
+# fix ELB health check
+sed -i '48,50c\
+       set $should_redirect "no"; \
+       if ($http_host != $$ENV_DISCOURSE_HOSTNAME) { \
+          set $should_redirect "yes"; \
+       } \
+       if ($request_uri = "/srv/status") { \
+          set $should_redirect "no"; \
+       } \
+       if ($should_redirect = "yes") { \
+          rewrite (.*) https://$$ENV_DISCOURSE_HOSTNAME$1 permanent; \
+       }
+' /var/discourse/templates/web.ssl.template.yml
 # pull initial image
 docker pull discourse/base:2.0.20230711-0100
 
