@@ -1,5 +1,9 @@
+import os
+import subprocess
+
 from aws_cdk import (
     CfnMapping,
+    CfnOutput,
     CfnParameter,
     Stack
 )
@@ -17,6 +21,14 @@ from oe_patterns_cdk_common.elasticache_cluster import ElasticacheRedis
 from oe_patterns_cdk_common.ses import Ses
 from oe_patterns_cdk_common.util import Util
 from oe_patterns_cdk_common.vpc import Vpc
+
+if 'TEMPLATE_VERSION' in os.environ:
+    template_version = os.environ['TEMPLATE_VERSION']
+else:
+    try:
+        template_version = subprocess.check_output(["git", "describe", "--always"]).strip().decode('ascii')
+    except:
+        template_version = "CICD"
 
 AMI_ID="ami-01c4f3d5ecf8fbb3c"
 AMI_NAME="ordinary-experts-patterns-discourse-07e8d10-20231221-0621"
@@ -124,7 +136,7 @@ class DiscourseStack(Stack):
         )
 
         # efs
-        Efs(self, "Efs", app_sg=asg.sg, vpc=vpc)
+        efs = Efs(self, "Efs", app_sg=asg.sg, vpc=vpc)
 
         alb = Alb(
             self,
@@ -136,3 +148,58 @@ class DiscourseStack(Stack):
         asg.asg.target_group_arns = [ alb.target_group.ref ]
 
         dns.add_alb(alb)
+
+        CfnOutput(
+            self,
+            "FirstUseInstructions",
+            description="Instructions for getting started",
+            value="Click on the DnsSiteUrlOutput link and register a new user using one of the emails specified in the 'Admin Emails' parameter. You should then receive a confirmation email to complete the registration as an admin user."
+        )
+
+        parameter_groups = [
+            {
+                "Label": {
+                    "default": "Application Config"
+                },
+                "Parameters": [
+                    self.name_param.logical_id,
+                    self.admin_emails_param.logical_id
+                ]
+            }
+        ]
+        parameter_groups += alb.metadata_parameter_group()
+        parameter_groups += bucket.metadata_parameter_group()
+        parameter_groups += db_secret.metadata_parameter_group()
+        parameter_groups += db.metadata_parameter_group()
+        parameter_groups += dns.metadata_parameter_group()
+        parameter_groups += efs.metadata_parameter_group()
+        parameter_groups += redis.metadata_parameter_group()
+        parameter_groups += asg.metadata_parameter_group()
+        parameter_groups += ses.metadata_parameter_group()
+        parameter_groups += vpc.metadata_parameter_group()
+
+        # AWS::CloudFormation::Interface
+        self.template_options.metadata = {
+            "OE::Patterns::TemplateVersion": template_version,
+            "AWS::CloudFormation::Interface": {
+                "ParameterGroups": parameter_groups,
+                "ParameterLabels": {
+                    self.name_param.logical_id: {
+                        "default": "Discourse Site Name"
+                    },
+                    self.admin_emails_param.logical_id: {
+                        "default": "Admin Emails"
+                    },
+                    **alb.metadata_parameter_labels(),
+                    **bucket.metadata_parameter_labels(),
+                    **db_secret.metadata_parameter_labels(),
+                    **db.metadata_parameter_labels(),
+                    **dns.metadata_parameter_labels(),
+                    **efs.metadata_parameter_labels(),
+                    **redis.metadata_parameter_labels(),
+                    **asg.metadata_parameter_labels(),
+                    **ses.metadata_parameter_labels(),
+                    **vpc.metadata_parameter_labels()
+                }
+            }
+        }
