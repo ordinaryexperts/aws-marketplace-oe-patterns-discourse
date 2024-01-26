@@ -164,9 +164,20 @@ run:
 EOF
 chmod o-rwx /var/discourse/containers/app.yml
 
+PLUGIN_COMMANDS_LIST="${PluginCommandsList}"
+if [ -n "$PLUGIN_COMMANDS_LIST" ]; then
+    cd /var/discourse/containers
+    awk -v list="$PLUGIN_COMMANDS_LIST" '/- git clone https:\/\/github.com\/discourse\/docker_manager.git/ {
+        print
+        n = split(list, arr, ",")
+        for (i = 1; i <= n; i++) {
+            printf "          - %s\n", arr[i]
+        }
+        next
+    }1' app.yml > temp.yml && mv temp.yml app.yml
+fi
 cd /var/discourse
-./launcher bootstrap app
-./launcher start app
+./launcher rebuild app
 
 success=$?
 cfn-signal --exit-code $success --stack ${AWS::StackName} --resource Asg --region ${AWS::Region}
