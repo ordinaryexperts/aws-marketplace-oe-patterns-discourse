@@ -177,7 +177,23 @@ if [ -n "$PLUGIN_COMMANDS_LIST" ]; then
     }1' app.yml > temp.yml && mv temp.yml app.yml
 fi
 cd /var/discourse
-./launcher rebuild app
+existing=`docker ps -a | awk '{ print $1, $(NF) }' | grep " app$" | awk '{ print $1 }'`
+if [ ! -z $existing ]; then
+    echo "Stopping old container"
+    (
+        set -x
+        docker stop -t 600 app
+    )
+fi
+./launcher bootstrap app
+if [ ! -z $existing ]; then
+    echo "Removing old container"
+    (
+        set -x
+        docker rm app
+    )
+fi
+./launcher start app
 
 success=$?
 cfn-signal --exit-code $success --stack ${AWS::StackName} --resource Asg --region ${AWS::Region}
