@@ -214,7 +214,7 @@ sed -i '48,50c\
        }
 ' /var/discourse/templates/web.ssl.template.yml
 # pull initial image
-docker pull discourse/base:2.0.20230711-0100
+docker pull discourse/base:2.0.20231218-0429
 
 # post install steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_POSTINSTALL"

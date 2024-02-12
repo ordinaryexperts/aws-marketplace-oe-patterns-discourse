@@ -164,8 +164,35 @@ run:
 EOF
 chmod o-rwx /var/discourse/containers/app.yml
 
+PLUGIN_COMMANDS_LIST="${PluginCommandsList}"
+if [ -n "$PLUGIN_COMMANDS_LIST" ]; then
+    cd /var/discourse/containers
+    awk -v list="$PLUGIN_COMMANDS_LIST" '/- git clone https:\/\/github.com\/discourse\/docker_manager.git/ {
+        print
+        n = split(list, arr, ",")
+        for (i = 1; i <= n; i++) {
+            printf "          - %s\n", arr[i]
+        }
+        next
+    }1' app.yml > temp.yml && mv temp.yml app.yml
+fi
 cd /var/discourse
+existing=`docker ps -a | awk '{ print $1, $(NF) }' | grep " app$" | awk '{ print $1 }'`
+if [ ! -z $existing ]; then
+    echo "Stopping old container"
+    (
+        set -x
+        docker stop -t 600 app
+    )
+fi
 ./launcher bootstrap app
+if [ ! -z $existing ]; then
+    echo "Removing old container"
+    (
+        set -x
+        docker rm app
+    )
+fi
 ./launcher start app
 
 success=$?

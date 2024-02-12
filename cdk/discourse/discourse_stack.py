@@ -62,6 +62,13 @@ class DiscourseStack(Stack):
             description="Comma-separated list of admin emails for this Discourse site."
         )
 
+        self.plugin_commands_list_param = CfnParameter(
+            self,
+            "PluginCommandsList",
+            default="",
+            description="Comma-separated list of commands to run to install plugins."
+        )
+
         dns = Dns(self, "Dns")
 
         bucket = AssetsBucket(
@@ -112,9 +119,10 @@ class DiscourseStack(Stack):
             user_data_variables = {
                 "AssetsBucketName": bucket.bucket_name(),
                 "DbSecretArn": db_secret.secret_arn(),
-                "Hostname": dns.hostname(),
                 "HostedZoneName": dns.route_53_hosted_zone_name_param.value_as_string,
-                "InstanceSecretArn": ses.secret_arn()
+                "Hostname": dns.hostname(),
+                "InstanceSecretArn": ses.secret_arn(),
+                "PluginCommandsList": self.plugin_commands_list_param.value_as_string
             },
             vpc = vpc
         )
@@ -163,7 +171,8 @@ class DiscourseStack(Stack):
                 },
                 "Parameters": [
                     self.name_param.logical_id,
-                    self.admin_emails_param.logical_id
+                    self.admin_emails_param.logical_id,
+                    self.plugin_commands_list_param.logical_id
                 ]
             }
         ]
@@ -189,6 +198,9 @@ class DiscourseStack(Stack):
                     },
                     self.admin_emails_param.logical_id: {
                         "default": "Admin Emails"
+                    },
+                    self.plugin_commands_list_param.logical_id: {
+                        "default": "Plugin Commands List"
                     },
                     **alb.metadata_parameter_labels(),
                     **bucket.metadata_parameter_labels(),
