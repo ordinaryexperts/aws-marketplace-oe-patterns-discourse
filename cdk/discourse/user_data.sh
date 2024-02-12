@@ -74,7 +74,7 @@ params:
   #db_work_mem: "40MB"
 
   ## Which Git revision should this container use? (default: tests-passed)
-  #version: tests-passed
+  version: v3.2.0
 
 env:
   LC_ALL: en_US.UTF-8
