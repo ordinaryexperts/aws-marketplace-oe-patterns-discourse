@@ -30,10 +30,10 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-01c4f3d5ecf8fbb3c"
-AMI_NAME="ordinary-experts-patterns-discourse-07e8d10-20231221-0621"
+AMI_ID="ami-04ca1a34c931e1d56"
+AMI_NAME="ordinary-experts-patterns-discourse-d7c47a2-20240506-0250"
 generated_ami_ids = {
-    "us-east-1": "ami-01c4f3d5ecf8fbb3c"
+    "us-east-1": "ami-04ca1a34c931e1d56"
 }
 # End generated code block.
 
