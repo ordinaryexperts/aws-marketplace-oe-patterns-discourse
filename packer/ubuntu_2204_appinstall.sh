@@ -198,7 +198,7 @@ apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 # https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md#5-install-discourse
 git clone https://github.com/discourse/discourse_docker.git /var/discourse
 cd /var/discourse
-git checkout fcce1376043adeb09e21ec1ec079a41e4d29fe6e # base image to discourse/base:2.0.20231218-0429
+git checkout 20e33fbfd98d3b8d9c57f7a111beff8aa51a5b98 # base image to discourse/base:2.0.20240825-0027
 chmod 700 containers
 # fix ELB health check
 sed -i '48,50c\

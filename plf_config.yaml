@@ -14,7 +14,7 @@ Automatically configured to support auto-scaling through AWS Autoscaling Groups,
 The template ensure multi-level security by incorporating AWS IAM for federated access to resources with least privilege and AWS managed keys and Secret Manager to manage secrets for encryption of data at rest and in transit.
 
 We support multiple availability zones using an RDS Aurora Postgresql cluster and EC2 Auto Scaling Groups."
-"Highlight1": "Production-ready Discourse v3.2 site, with search, email, and caching"
+"Highlight1": "Production-ready Discourse v3.3.2 site, with search, email, and caching"
 "Highlight2": "Integrated with AWS Certificate Manager for HTTPS support"
 "Highlight3": "Logs in CloudWatch Logs, Remote access via Session Manager"
 "Product Category1": "Application Stacks"
@@ -28,7 +28,7 @@ We support multiple availability zones using an RDS Aurora Postgresql cluster an
 "Resource3_Name": "Discourse Homepage"
 "Resource3_URL": "https://www.discourse.org/"
 "Image URL": "https://ordinaryexperts.com/img/products/discourse-pattern/discourse-product-logo.png"
-"Product Video": "TODO"
+"Product Video": "https://youtu.be/yJE50q_9CBg"
 "Support Offered": "TRUE"
 "Support Information": ""
 "Support Detail": "Email support offered with subscription. https://ordinaryexperts.com/products/discourse-pattern/"
@@ -158,7 +158,7 @@ We support multiple availability zones using an RDS Aurora Postgresql cluster an
 "Clusters and AWS Resources Topology 1: Title": "Ordinary Experts Discourse Pattern"
 "Clusters and AWS Resources Topology 1: AWS Calculator Link": "https://calculator.aws/#/estimate?id=f6ff0b26e3df80708a7f8caac3334b116e28d6a6"
 "Clusters and AWS Resources Topology 1: Short Description": "Ordinary Experts Discourse Pattern AWS Architecture Diagram"
-"Clusters and AWS Resources Topology 1: Long Description": "The Ordinary Experts Discourse Patterns AWS Architecture Diagram shows the total flow of services from when the customer accesses the Discourse application. The diagram shows the following AWS Services: Amazon Simple Storage System (Amazon S3), Amazon Elastic Compute Cloud (Amazon EC2), Amazon Virtual Public Cloud (Amazon VPC), Amazon Aurora Postgresql, Amazon Secrets Manager, Amazon OpenSearch Service, and Amazon ElastiCache."
+"Clusters and AWS Resources Topology 1: Long Description": "The Ordinary Experts Discourse Patterns AWS Architecture Diagram shows the total flow of services from when the customer accesses the Discourse application. The diagram shows the following AWS Services: Amazon Simple Storage System (Amazon S3), Amazon Elastic Compute Cloud (Amazon EC2), Amazon Elastic File System (Amazon EFS), Amazon Virtual Public Cloud (Amazon VPC), Amazon Aurora Postgresql, Amazon Secrets Manager, and Amazon ElastiCache."
 "Clusters and AWS Resources Topology 1: CloudFormation Template URL": "https://ordinary-experts-aws-marketplace-pattern-artifacts.s3.amazonaws.com/discourse/{{version}}/template.yaml"
 "Clusters and AWS Resources Topology 1: Architecture Diagram URL": "https://ordinaryexperts.com/img/products/discourse-pattern/discourse-aws-diagram.png"
 "Clusters and AWS Resources Topology 2: Title": ""
