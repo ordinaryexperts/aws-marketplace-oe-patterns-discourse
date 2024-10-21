@@ -1,1 +1,5 @@
-# aws-marketplace-oe-patterns-discourse
+# Discourse on AWS
+
+_An Ordinary Experts Marketplace Product_
+
+This repository contains the CDK and Packer code for the Ordinary Experts' Discourse AWS Marketplace Pattern.
