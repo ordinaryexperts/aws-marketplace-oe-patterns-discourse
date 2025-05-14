@@ -68,13 +68,13 @@ params:
 
   ## Set db_shared_buffers to a max of 25% of the total memory.
   ## will be set automatically by bootstrap based on detected RAM, or you can override
-  db_shared_buffers: "4096MB"
+  #db_shared_buffers: "4096MB"
 
   ## can improve sorting performance, but adds memory usage per-connection
   #db_work_mem: "40MB"
 
   ## Which Git revision should this container use? (default: tests-passed)
-  version: v3.3.2
+  version: v3.4.2
 
 env:
   LC_ALL: en_US.UTF-8

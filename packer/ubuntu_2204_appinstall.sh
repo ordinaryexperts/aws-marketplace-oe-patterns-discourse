@@ -1,6 +1,6 @@
-SCRIPT_VERSION=1.3.0
-SCRIPT_PREINSTALL=ubuntu_2004_2204_preinstall.sh
-SCRIPT_POSTINSTALL=ubuntu_2004_2204_postinstall.sh
+SCRIPT_VERSION=1.6.1
+SCRIPT_PREINSTALL=ubuntu_2204_2404_preinstall.sh
+SCRIPT_POSTINSTALL=ubuntu_2204_2404_postinstall.sh
 
 # preinstall steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_PREINSTALL"
@@ -198,10 +198,11 @@ apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 # https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md#5-install-discourse
 git clone https://github.com/discourse/discourse_docker.git /var/discourse
 cd /var/discourse
-git checkout 20e33fbfd98d3b8d9c57f7a111beff8aa51a5b98 # base image to discourse/base:2.0.20240825-0027
+# https://github.com/discourse/discourse_docker/blob/main/launcher#L95
+git checkout e42fa9711e9a8b27e9618342b5b456d3ba5b8025 # base image to discourse/base:2.0.20250226-0128
 chmod 700 containers
 # fix ELB health check
-sed -i '48,50c\
+sed -i '39,41c\
        set $should_redirect "no"; \
        if ($http_host != $$ENV_DISCOURSE_HOSTNAME) { \
           set $should_redirect "yes"; \
@@ -214,7 +215,7 @@ sed -i '48,50c\
        }
 ' /var/discourse/templates/web.ssl.template.yml
 # pull initial image
-docker pull discourse/base:2.0.20231218-0429
+docker pull discourse/base:2.0.20250226-0128
 
 # post install steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_POSTINSTALL"
