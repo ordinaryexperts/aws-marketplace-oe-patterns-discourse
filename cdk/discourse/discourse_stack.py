@@ -29,7 +29,7 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-0eaa5dd63537eebc4" # ordinary-experts-patterns-discourse-1.0.1-3-g4fa9f21-20250312-0647
+AMI_ID="ami-005662f15de668eb0" # ordinary-experts-patterns-discourse-1.1.0-20250415-0844
 
 class DiscourseStack(Stack):
 
