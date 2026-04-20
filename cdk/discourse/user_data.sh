@@ -73,8 +73,8 @@ params:
   ## can improve sorting performance, but adds memory usage per-connection
   #db_work_mem: "40MB"
 
-  ## Which Git revision should this container use? (default: tests-passed)
-  version: v3.4.2
+  ## Which Git revision should this container use? (default: latest)
+  version: v2026.3.0
 
 env:
   LC_ALL: en_US.UTF-8

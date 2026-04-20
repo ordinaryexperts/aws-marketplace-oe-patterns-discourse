@@ -1,4 +1,4 @@
-SCRIPT_VERSION=1.6.1
+SCRIPT_VERSION=1.9.1
 SCRIPT_PREINSTALL=ubuntu_2204_2404_preinstall.sh
 SCRIPT_POSTINSTALL=ubuntu_2204_2404_postinstall.sh
 
@@ -198,24 +198,22 @@ apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 # https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md#5-install-discourse
 git clone https://github.com/discourse/discourse_docker.git /var/discourse
 cd /var/discourse
-# https://github.com/discourse/discourse_docker/blob/main/launcher#L95
-git checkout e42fa9711e9a8b27e9618342b5b456d3ba5b8025 # base image to discourse/base:2.0.20250226-0128
+# Pin discourse_docker to a commit whose launcher's default `image=` matches
+# the `docker pull` below. Otherwise bootstrap pulls a different tag than
+# the one baked into the AMI, defeating the pre-pull.
+git checkout cfc1ce2 # launcher image=discourse/base:2.0.20260209-1300
 chmod 700 containers
-# fix ELB health check
-sed -i '39,41c\
-       set $should_redirect "no"; \
-       if ($http_host != $$ENV_DISCOURSE_HOSTNAME) { \
-          set $should_redirect "yes"; \
-       } \
-       if ($request_uri = "/srv/status") { \
-          set $should_redirect "no"; \
-       } \
-       if ($should_redirect = "yes") { \
-          rewrite (.*) https://$$ENV_DISCOURSE_HOSTNAME$1 permanent; \
-       }
-' /var/discourse/templates/web.ssl.template.yml
-# pull initial image
-docker pull discourse/base:2.0.20250226-0128
+# fix ELB health check: the HTTPS server block has a hostname-check rewrite
+# that 301's requests whose Host header != DISCOURSE_HOSTNAME. ALB health
+# checks send Host=<target-ip> which doesn't match, so /srv/status returns
+# 301 and the target goes unhealthy. Insert a nested exception so /srv/status
+# returns 200 even when Host doesn't match. This is a pattern-based sed
+# (matches 'rewrite ... permanent') so it survives line renumbering in
+# future discourse_docker refactors.
+sed -i '/if (\\$http_host != ${DISCOURSE_HOSTNAME})/i\        if (\\$request_uri = "/srv/status") { return 200; }' /var/discourse/templates/web.ssl.template.yml
+# pull initial image (must match launcher's default `image=` at the pinned
+# discourse_docker commit — see commented checkout above)
+docker pull discourse/base:2.0.20260209-1300
 
 # post install steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_POSTINSTALL"

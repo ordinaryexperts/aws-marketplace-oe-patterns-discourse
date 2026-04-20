@@ -29,7 +29,8 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-0e39ca6a2d931d8ea" # ordinary-experts-patterns-discourse-1.1.0-1-g8bce9ed-20250514-0554
+AMI_ID="ami-003e495832b6a1c6c" # ordinary-experts-patterns-discourse-1.2.0
+NEXT_RELEASE_PREFIX="v120"
 
 class DiscourseStack(Stack):
 
@@ -99,6 +100,7 @@ class DiscourseStack(Stack):
             self,
             "Asg",
             ami_id=AMI_ID,
+            ami_id_param_name_suffix=NEXT_RELEASE_PREFIX,
             secret_arns=[db_secret.secret_arn(), ses.secret_arn()],
             create_and_update_timeout_minutes = 30,
             default_instance_type = "t3.xlarge",
