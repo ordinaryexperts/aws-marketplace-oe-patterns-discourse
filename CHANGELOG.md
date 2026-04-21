@@ -1,5 +1,18 @@
 # Unreleased
 
+# 1.2.0
+
+* Upgrade Discourse to v2026.3.0
+* Upgrade Ubuntu to 24.04
+* Upgrade to OE CDK library 4.5.0
+  * Upgrade Aurora PostgreSQL to 15.13 (was 15.4) *causes downtime during upgrade*
+  * Upgrade ElastiCache Redis to 7.0 (was 6.2)
+* Upgrade CDK to 2.225.0
+* Upgrade OE devenv to 2.8.3
+* Introduce versioned AMI parameter (AsgAmiIdv120)
+* Switch to AWS Marketplace Catalog API workflow (replaces PLF)
+* Remove bundled discourse-math and discourse-cakeday plugins (now in Discourse core)
+
 # 1.1.0
 
 * Upgrade Discourse to v3.4.2

@@ -1,7 +1,7 @@
-# Discourse on AWS
+# Discourse on AWS by FOSSonCloud
 
-_An Ordinary Experts Marketplace Product_
+_A FOSSonCloud AWS Marketplace Product_
 
-This repository contains the CDK and Packer code for the Ordinary Experts' Discourse AWS Marketplace Pattern.
+This repository contains the CDK and Packer code for the **Discourse on AWS by FOSSonCloud** pattern — a one-click AWS Marketplace deployment for [Discourse](https://www.discourse.org/).
 
 [Try it here](https://aws.amazon.com/marketplace/pp/prodview-nhgzw6qrtwsgo)
