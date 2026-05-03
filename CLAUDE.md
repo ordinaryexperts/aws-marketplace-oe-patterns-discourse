@@ -14,7 +14,7 @@ The infrastructure includes: VPC, EC2 Auto Scaling Group, Aurora PostgreSQL, Ela
 
 ## Upgrade Workflow
 
-For upgrading the upstream Discourse version, follow the process in [aws-marketplace-utilities/UPGRADE.md](https://github.com/ordinaryexperts/aws-marketplace-utilities/blob/main/UPGRADE.md).
+For upgrading the upstream Discourse version, follow the process in [aws-marketplace-utilities/UPGRADE.md](https://github.com/ordinaryexperts/aws-marketplace-utilities/blob/develop/UPGRADE.md).
 
 ### Discourse-specific upgrade notes
 
