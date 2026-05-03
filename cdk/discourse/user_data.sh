@@ -74,7 +74,7 @@ params:
   #db_work_mem: "40MB"
 
   ## Which Git revision should this container use? (default: latest)
-  version: v2026.3.0
+  version: v2026.4.0
 
 env:
   LC_ALL: en_US.UTF-8
