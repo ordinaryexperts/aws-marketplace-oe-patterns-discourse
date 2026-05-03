@@ -67,4 +67,4 @@ delivery_option:
     - At least one admin email address for initial account setup
   # Version-pinned; update when bumping TEMPLATE_VERSION.
   # After `make publish-diagram TEMPLATE_VERSION=<v>`, this URL will be valid.
-  architecture_diagram_url: "https://ordinary-experts-aws-marketplace-pattern-artifacts.s3.amazonaws.com/discourse/1.2.0/diagram.png"
+  architecture_diagram_url: "https://ordinary-experts-aws-marketplace-pattern-artifacts.s3.amazonaws.com/discourse/1.3.0/diagram.png"

@@ -6,7 +6,7 @@
 * Upgrade discourse_docker pin to commit `e295aff` (same `discourse/base:2.0.20260209-1300` image; picks up "Clear stuck web upgrade flags after a full rebuild" fix)
 * Upgrade OE devenv to 2.8.4 (fixes missing `pytest`/`playwright` in `:2.8.3` container)
 * Bump versioned AMI parameter to `AsgAmiIdv130`
-* Add integration test suite (`test/integration/`) — health, infrastructure, and UI smoke tests via pytest + Playwright
+* Add integration test suite (`test/integration/`) - health, infrastructure, and UI smoke tests via pytest + Playwright
 
 # 1.2.0
 
