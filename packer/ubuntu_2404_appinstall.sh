@@ -201,7 +201,7 @@ cd /var/discourse
 # Pin discourse_docker to a commit whose launcher's default `image=` matches
 # the `docker pull` below. Otherwise bootstrap pulls a different tag than
 # the one baked into the AMI, defeating the pre-pull.
-git checkout cfc1ce2 # launcher image=discourse/base:2.0.20260209-1300
+git checkout e295aff # launcher image=discourse/base:2.0.20260209-1300
 chmod 700 containers
 # fix ELB health check: the HTTPS server block has a hostname-check rewrite
 # that 301's requests whose Host header != DISCOURSE_HOSTNAME. ALB health
