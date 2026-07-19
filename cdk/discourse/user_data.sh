@@ -74,7 +74,7 @@ params:
   #db_work_mem: "40MB"
 
   ## Which Git revision should this container use? (default: latest)
-  version: v2026.4.0
+  version: v2026.6.0
 
 env:
   LC_ALL: en_US.UTF-8
@@ -85,7 +85,7 @@ env:
   # DB Settings
   DISCOURSE_DB_USERNAME: $DB_USERNAME
   DISCOURSE_DB_PASSWORD: $DB_PASSWORD
-  DISCOURSE_DB_HOST: ${DbCluster.Endpoint.Address}
+  DISCOURSE_DB_HOST: ${DbHost}
   DISCOURSE_DB_NAME: discourse
 
   DISCOURSE_USE_S3: true
@@ -119,7 +119,7 @@ env:
   DISCOURSE_SMTP_DOMAIN: ${HostedZoneName}
   DISCOURSE_NOTIFICATION_EMAIL: no-reply@${HostedZoneName}
 
-  DISCOURSE_REDIS_HOST: ${RedisCluster.RedisEndpoint.Address}
+  DISCOURSE_REDIS_HOST: ${RedisHost}
 
   ## The http or https CDN address for this Discourse instance (configured to pull)
   ## see https://meta.discourse.org/t/14857 for details

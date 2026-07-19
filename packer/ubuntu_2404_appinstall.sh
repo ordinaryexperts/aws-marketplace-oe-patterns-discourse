@@ -1,4 +1,4 @@
-SCRIPT_VERSION=1.9.1
+SCRIPT_VERSION=1.10.3
 SCRIPT_PREINSTALL=ubuntu_2204_2404_preinstall.sh
 SCRIPT_POSTINSTALL=ubuntu_2204_2404_postinstall.sh
 
@@ -201,7 +201,7 @@ cd /var/discourse
 # Pin discourse_docker to a commit whose launcher's default `image=` matches
 # the `docker pull` below. Otherwise bootstrap pulls a different tag than
 # the one baked into the AMI, defeating the pre-pull.
-git checkout e295aff # launcher image=discourse/base:2.0.20260209-1300
+git checkout 472e9ce # launcher image=discourse/base:2.0.20260706-0040
 chmod 700 containers
 # fix ELB health check: the HTTPS server block has a hostname-check rewrite
 # that 301's requests whose Host header != DISCOURSE_HOSTNAME. ALB health
@@ -213,7 +213,7 @@ chmod 700 containers
 sed -i '/if (\\$http_host != ${DISCOURSE_HOSTNAME})/i\        if (\\$request_uri = "/srv/status") { return 200; }' /var/discourse/templates/web.ssl.template.yml
 # pull initial image (must match launcher's default `image=` at the pinned
 # discourse_docker commit — see commented checkout above)
-docker pull discourse/base:2.0.20260209-1300
+docker pull discourse/base:2.0.20260706-0040
 
 # post install steps
 curl -O "https://raw.githubusercontent.com/ordinaryexperts/aws-marketplace-utilities/$SCRIPT_VERSION/packer_provisioning_scripts/$SCRIPT_POSTINSTALL"

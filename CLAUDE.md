@@ -212,7 +212,7 @@ Defined in `cdk/requirements.txt`:
 - `oe-patterns-cdk-common@4.2.4` (from GitHub)
 
 ### Docker Base Image
-`ordinaryexperts/aws-marketplace-patterns-devenv:2.5.4`
+`ordinaryexperts/aws-marketplace-patterns-devenv:2.8.6`
 
 ## Files to Update When Releasing
 

@@ -29,8 +29,8 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-01b623fd57fbb94cf" # ordinary-experts-patterns-discourse-1.3.0-20260502-0956 (dev, for taskcat CI)
-NEXT_RELEASE_PREFIX="v130"
+AMI_ID="ami-01d20fe45209bdfee" # ordinary-experts-patterns-discourse-1.4.0-20260717-0740 (dev, for taskcat CI)
+NEXT_RELEASE_PREFIX="v140"
 
 class DiscourseStack(Stack):
 
@@ -108,11 +108,13 @@ class DiscourseStack(Stack):
             user_data_contents = user_data,
             user_data_variables = {
                 "AssetsBucketName": bucket.bucket_name(),
+                "DbHost": db.db_cluster.attr_endpoint_address,
                 "DbSecretArn": db_secret.secret_arn(),
                 "HostedZoneName": dns.route_53_hosted_zone_name_param.value_as_string,
                 "Hostname": dns.hostname(),
                 "InstanceSecretArn": ses.secret_arn(),
-                "PluginCommandsList": self.plugin_commands_list_param.value_as_string
+                "PluginCommandsList": self.plugin_commands_list_param.value_as_string,
+                "RedisHost": redis.elasticache_cluster.attr_redis_endpoint_address
             },
             vpc = vpc
         )
