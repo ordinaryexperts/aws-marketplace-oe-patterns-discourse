@@ -1,5 +1,7 @@
 # Unreleased
 
+# 1.4.0
+
 * Fix a deploy-order race condition where the ASG launch template could bake in an empty `DISCOURSE_REDIS_HOST` (and, less reliably, `DISCOURSE_DB_HOST`): both were resolved via raw `${RedisCluster.RedisEndpoint.Address}` / `${DbCluster.Endpoint.Address}` text in `user_data.sh`, which CDK's dependency graph can't see into, so CloudFormation could create the launch template before those resources finished. Discourse then tried to reach Redis on `127.0.0.1:6379`, `bundle exec rake db:migrate` failed during `./launcher bootstrap app`, and the app never came up (ALB returned 502 on every endpoint). Fixed by passing `DbHost`/`RedisHost` through `user_data_variables` as genuine CDK attribute references, which CloudFormation's `Fn::Sub` variable map reliably depends on.
 * Fix `test/integration/config.yaml`'s `expected_version` (was hardcoded to the old pinned Discourse version, so `test_about_api` would fail after any version bump)
 * Fix `docker-compose.yml` missing `TEST_BASE_URL`/`TEST_STACK_NAME` in the `environment:` passthrough list, so the override mechanism documented in `test/integration/README.md` silently did nothing
