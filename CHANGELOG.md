@@ -1,5 +1,17 @@
 # Unreleased
 
+# 1.4.0
+
+* Fix a deploy-order race condition where the ASG launch template could bake in an empty `DISCOURSE_REDIS_HOST` (and, less reliably, `DISCOURSE_DB_HOST`): both were resolved via raw `${RedisCluster.RedisEndpoint.Address}` / `${DbCluster.Endpoint.Address}` text in `user_data.sh`, which CDK's dependency graph can't see into, so CloudFormation could create the launch template before those resources finished. Discourse then tried to reach Redis on `127.0.0.1:6379`, `bundle exec rake db:migrate` failed during `./launcher bootstrap app`, and the app never came up (ALB returned 502 on every endpoint). Fixed by passing `DbHost`/`RedisHost` through `user_data_variables` as genuine CDK attribute references, which CloudFormation's `Fn::Sub` variable map reliably depends on.
+* Fix `test/integration/config.yaml`'s `expected_version` (was hardcoded to the old pinned Discourse version, so `test_about_api` would fail after any version bump)
+* Fix `docker-compose.yml` missing `TEST_BASE_URL`/`TEST_STACK_NAME` in the `environment:` passthrough list, so the override mechanism documented in `test/integration/README.md` silently did nothing
+* Upgrade Discourse to v2026.6.0 (was v2026.4.0)
+* Upgrade discourse_docker pin to commit `472e9ce` (`discourse/base:2.0.20260706-0040`, up from `2.0.20260209-1300`; new base image includes both PG15 and PG18 clients)
+* Upgrade OE devenv to 2.8.4 -> 2.8.6 (bundled Node.js runtime 20 -> 22 LTS, fixes JSII EOL warnings)
+* Upgrade aws-marketplace-utilities script pin (packer preinstall + common.mk) to 1.10.3 (was 1.9.1) - picks up an EFS-utils AMI build reliability fix (previously `build-deb.sh` could silently fail to produce mount.efs without erroring the build)
+* Upgrade oe-patterns-cdk-common to 4.5.1 (was 4.5.0) - additive-only Secret construct params, no behavior change for this stack
+* Bump versioned AMI parameter to `AsgAmiIdv140`
+
 # 1.3.0
 
 * Upgrade Discourse to v2026.4.0 (was v2026.3.0)

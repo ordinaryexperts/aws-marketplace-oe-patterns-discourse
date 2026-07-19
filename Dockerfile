@@ -1,4 +1,4 @@
-FROM ordinaryexperts/aws-marketplace-patterns-devenv:2.8.4
+FROM ordinaryexperts/aws-marketplace-patterns-devenv:2.8.6
 # FROM devenv:latest
 
 # install dependencies

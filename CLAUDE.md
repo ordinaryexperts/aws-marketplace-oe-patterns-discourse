@@ -14,7 +14,7 @@ The infrastructure includes: VPC, EC2 Auto Scaling Group, Aurora PostgreSQL, Ela
 
 ## Upgrade Workflow
 
-For upgrading the upstream Discourse version, follow the process in [aws-marketplace-utilities/UPGRADE.md](https://github.com/ordinaryexperts/aws-marketplace-utilities/blob/main/UPGRADE.md).
+For upgrading the upstream Discourse version, follow the process in [aws-marketplace-utilities/UPGRADE.md](https://github.com/ordinaryexperts/aws-marketplace-utilities/blob/develop/UPGRADE.md).
 
 ### Discourse-specific upgrade notes
 
@@ -212,7 +212,7 @@ Defined in `cdk/requirements.txt`:
 - `oe-patterns-cdk-common@4.2.4` (from GitHub)
 
 ### Docker Base Image
-`ordinaryexperts/aws-marketplace-patterns-devenv:2.5.4`
+`ordinaryexperts/aws-marketplace-patterns-devenv:2.8.6`
 
 ## Files to Update When Releasing
 
