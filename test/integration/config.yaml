@@ -7,7 +7,7 @@ application:
   health_expected_response: null  # /srv/status returns 200 with empty body (patched in packer script)
   version_endpoint: "/about.json"
   version_field: "about.version"
-  expected_version: "2026.4.0"
+  expected_version: "2026.6.0"
 
 aws:
   region: "us-east-1"
