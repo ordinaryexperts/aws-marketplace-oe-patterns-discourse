@@ -29,7 +29,7 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-00cb32c72d0bd1f62" # ordinary-experts-patterns-discourse-1.4.0-20260719-0337 (prod, for marketplace submission)
+AMI_ID="ami-00cb32c72d0bd1f62" # ordinary-experts-patterns-discourse-1.4.0-20260719-0337 (prod, for marketplace submission; reused as-is for 1.4.1 since this release has no AMI/packer changes)
 NEXT_RELEASE_PREFIX="v140"
 
 class DiscourseStack(Stack):
@@ -118,7 +118,8 @@ class DiscourseStack(Stack):
             },
             vpc = vpc
         )
-        asg.asg.node.add_dependency(db.db_primary_instance)
+        asg.ec2_launch_template.node.add_dependency(db.db_primary_instance)
+        asg.ec2_launch_template.node.add_dependency(redis.elasticache_cluster)
         Util.add_sg_ingress(db, asg.sg)
         Util.add_sg_ingress(redis, asg.sg)
 
