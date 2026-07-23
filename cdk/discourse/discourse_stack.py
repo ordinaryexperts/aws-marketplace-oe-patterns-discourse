@@ -30,7 +30,7 @@ else:
         template_version = "CICD"
 
 AMI_ID="ami-00cb32c72d0bd1f62" # ordinary-experts-patterns-discourse-1.4.0-20260719-0337 (prod, for marketplace submission; reused as-is for 1.4.1 since this release has no AMI/packer changes)
-NEXT_RELEASE_PREFIX="v140"
+NEXT_RELEASE_PREFIX="v141"
 
 class DiscourseStack(Stack):
 
