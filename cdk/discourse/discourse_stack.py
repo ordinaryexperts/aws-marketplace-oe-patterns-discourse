@@ -118,7 +118,8 @@ class DiscourseStack(Stack):
             },
             vpc = vpc
         )
-        asg.asg.node.add_dependency(db.db_primary_instance)
+        asg.ec2_launch_template.node.add_dependency(db.db_primary_instance)
+        asg.ec2_launch_template.node.add_dependency(redis.elasticache_cluster)
         Util.add_sg_ingress(db, asg.sg)
         Util.add_sg_ingress(redis, asg.sg)
 
