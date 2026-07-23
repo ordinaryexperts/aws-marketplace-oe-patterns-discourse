@@ -30,7 +30,7 @@ else:
         template_version = "CICD"
 
 AMI_ID="ami-01d20fe45209bdfee" # ordinary-experts-patterns-discourse-1.4.0-20260717-0740 (dev, for taskcat CI)
-NEXT_RELEASE_PREFIX="v140"
+NEXT_RELEASE_PREFIX="v141"
 
 class DiscourseStack(Stack):
 
