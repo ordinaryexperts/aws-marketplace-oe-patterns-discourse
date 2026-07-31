@@ -29,8 +29,8 @@ else:
     except:
         template_version = "CICD"
 
-AMI_ID="ami-06098854cd2933255" # ordinary-experts-patterns-discourse-1.4.1-20260723-1054 (prod, for marketplace submission)
-NEXT_RELEASE_PREFIX="v141"
+AMI_ID="ami-065a8c06d8196e330" # ordinary-experts-patterns-discourse-1.4.2-20260730-0824 (prod, for marketplace submission)
+NEXT_RELEASE_PREFIX="v142"
 
 class DiscourseStack(Stack):
 
