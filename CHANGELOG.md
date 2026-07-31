@@ -1,5 +1,13 @@
 # Unreleased
 
+# 1.4.2
+
+* Upgrade Discourse to v2026.7.0 (was v2026.6.0)
+* Upgrade discourse_docker pin to commit `8e01602` (`discourse/base:2.0.20260726-0220`, up from `2.0.20260706-0040`)
+* Bump versioned AMI parameter to `AsgAmiIdv142`
+* Fix stale `AsgAmiIdv140` parameter name left in the `Makefile` `deploy` target after the 1.4.1 release (template's actual parameter had already moved to `AsgAmiIdv141`, so `make deploy` was passing a parameter the template didn't define)
+* Update `test/integration/config.yaml` `expected_version` to `2026.7.0`
+
 # 1.4.1
 
 * Fix a residual deploy-order race where the ASG launch template could still bake in an empty `DISCOURSE_REDIS_HOST` (and, less reliably, `DISCOURSE_DB_HOST`) even after the 1.4.0 fix. `DbHost`/`RedisHost` were correctly wired as `Fn::GetAtt` references in the `Fn::Sub` variable map, but nothing forced CloudFormation to wait for `RedisCluster`/`DbPrimaryInstance` to finish before creating `AsgLaunchTemplate` itself - the existing explicit dependency (`asg.asg.node.add_dependency(db.db_primary_instance)`) was attached to the Auto Scaling Group, not the launch template, so it couldn't prevent `UserData` from being frozen with a blank Redis host while ElastiCache was still provisioning. Confirmed via a live redeploy: `AsgLaunchTemplate` reached `CREATE_COMPLETE` 56 seconds before `RedisCluster` did, reproducing the same `Redis::CannotConnectError` / `pull access denied for local_discourse/app` failure as before. Fixed by moving the explicit dependency onto `asg.ec2_launch_template` and adding the missing Redis leg, so CloudFormation cannot create the launch template until both the DB and Redis are fully ready, regardless of which one provisions slower on a given deploy.
